@@ -1,0 +1,149 @@
+<style lang="less">
+
+  .userinfo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    .userinfo-avatar {
+      width: 80rpx;
+      height: 80rpx;
+      border-radius: 50%;
+    }
+
+    .userinfo-nickname {
+      color: #aaa;
+    }
+
+    .input{
+      border-bottom: 1px solid black;
+      margin-top: 50px;
+    }
+
+    .btn{
+      width: 200px;
+      margin-top: 60px;
+    }
+    text{
+      width: 100%;
+      display: block;
+      text-align: center;
+    }
+  }
+  .operater{
+    width: 100%;
+    display: flex;
+    padding:40rpx 0 40rpx;
+    button{
+      font-size: 14px;
+    }
+  }
+
+  
+</style>
+<template>
+
+  <view class="container">
+    <view class="userinfo">
+      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <text class="userinfo-nickname">{{ userInfo.nickName }}</text>
+      <view wx:if="{{steelBox}}">
+        <text>输入保险箱密码</text>
+        <input type="password" name="password" class="input">
+        <button class="btn" @tap="entry">进入</button>
+      </view>
+      <view wx:else>
+          <text>未拥有保险箱</text>
+      </view>
+    </view>
+    
+    <view class="operater">
+        <button @tap="create">去创建一个</button>
+        <button @tap="forgetPsw">忘记密码</button>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import List from '../components/list'
+  import Group from '../components/group'
+  import Toast from 'wepy-com-toast'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: 'test'
+    }
+    components = {
+      list: List,
+      group: Group,
+      toast: Toast
+    }
+
+    mixins = []
+
+    data = {
+      mynum: 20,
+      userInfo: {
+        nickName: '加载中...',
+        login: false
+      },
+      steelBox: {},
+      normalTitle: '原始标题',
+      setTimeoutTitle: '标题三秒后会被修改',
+      count: 0,
+      netrst: ''
+    }
+
+    computed = {
+      now () {
+        return +new Date()
+      }
+    }
+
+    methods = {
+      entry () {
+        this.$redirect('./lock')
+      },
+      create() {
+        this.$redirect("./create")
+      },
+      forgetPsw() {
+        this.$redirect('./forget')
+      }
+    }
+
+    events = {
+      'index-emit': (...args) => {
+        let $event = args[args.length - 1]
+        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+      }
+    }
+
+    onLoad() {
+      let self = this
+      console.log(this.$parent.globalData)
+      if(this.$parent.globalData.userInfo){
+        Object.assign(this.userInfo,this.$parent.globalData.userInfo);
+      }
+      if(this.$parent.globalData.steelBox){
+        Object.assign(this.steelBox, this.$parent.globalData.steelBox)
+      }
+      this.$parent.getUserInfo(function (userInfo) {
+        if (userInfo) {
+          self.userInfo = userInfo
+          self.userInfo.login = true
+        }
+        self.normalTitle = '标题已被修改'
+
+        self.setTimeoutTitle = '标题三秒后会被修改'
+        setTimeout(() => {
+          self.setTimeoutTitle = '到三秒了'
+          self.$apply()
+        }, 3000)
+
+        self.$apply()
+      })
+    }
+  }
+</script>

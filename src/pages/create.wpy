@@ -1,0 +1,84 @@
+<style lang="less">
+  .box{
+    width: 100%;
+    display: block;
+    text-align:center;
+    margin-top: 50rpx;
+    image{
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+    }
+  }
+  .main{
+    height: 100%;
+    width:100%;
+    text-align:center;
+    .input{
+      border-bottom: 1px solid black;
+      margin-top: 50px;
+      font-size: 30rpx;
+      width: 70%;
+      text-align:left;
+    }
+    .form{
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+
+
+  .btn{
+    width: 300px;
+    margin-top: 60px;
+  }
+</style>
+<template>
+  <view class="container">
+      <view class="main">
+        <text>新建保险箱</text>
+        <view class='box'>
+          <image src='../images/box.png'></image>
+        </view>
+        <view class="form">
+          <input type="text" name="pswName" placeholder="保险箱名称" class='input' @input="pasNameChange"/>
+          <input type="password" name="pswWord" placeholder="保险箱密码" class='input' @input="passwordChange"/>
+        </view>
+        <button class="btn" @tap="backNavigate">新建</button>
+      </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class Lock extends wepy.page {
+    data = {
+      pasName: '',
+      password: ''
+    }
+    methods = {
+      backNavigate() {
+        console.log(this.pasName,this.password)
+        console.log(this.$parent.globalData);
+        this.$parent.globalData.steelBox = {
+          pasName : this.pasName,
+          password: this.password
+        }
+        console.log(this.$parent.globalData);
+        this.$redirect('./index');
+      },
+      pasNameChange(ev) {
+        this.pasName = ev.detail.value
+      },
+      passwordChange(ev) {
+        this.password = ev.detail.value
+      }
+    }
+    onLoad (params, data) {
+
+    }
+  }
+</script>

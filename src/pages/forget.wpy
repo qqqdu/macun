@@ -1,0 +1,50 @@
+<style lang="less">
+  .userinfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .userinfo-avatar {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+  }
+
+  .userinfo-nickname {
+    color: #aaa;
+  }
+
+  .input{
+    border-bottom: 1px solid black;
+    margin-top: 50px;
+  }
+
+  .btn{
+    width: 200px;
+    margin-top: 60px;
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="userinfo">
+      忘记保险箱密码
+    </view>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class Lock extends wepy.page {
+    methods = {
+      backNavigate() {
+        this.$redirect('./index');
+      }
+    }
+    onLoad (params, data) {
+      console.log(wx.navigateBack)
+      console.log(data)
+    }
+  }
+</script>
