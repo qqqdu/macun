@@ -1,6 +1,6 @@
 <style lang="less">
   .box{
-    width: 100%;
+    width:100%;
     display: block;
     text-align:center;
     margin-top: 50rpx;
@@ -50,7 +50,6 @@
         display: block;
       }
       canvas{
-        left: 0;
       }
     }
   }
@@ -80,7 +79,7 @@
         </view>
         <view class="password">
           <text>手指刮开图层看密码</text>
-          <canvas style="width: 300px; height: 150px;" canvas-id="firstCanvas" id="firstCanvas"></canvas>
+          <canvas style="width:300px;height:50px;" canvas-id="firstCanvas" @tap='clickCanvas' @touchmove='moveFn'/>
         </view>
         <button class="btn" @tap="backNavigate">保存</button>
       </view>
@@ -93,7 +92,8 @@
     data = {
       pasName: '',
       password: '',
-      mark: ''
+      mark: '',
+      context: null
     }
     methods = {
       backNavigate() {
@@ -114,17 +114,59 @@
       },
       drawCanvas(ev) {
         let context = wx.createCanvasContext('firstCanvas')
-        context.drawImage('http://ganjz.cn/images//lock.jpg',0,0)
-        context.draw()
+        let width = 300;
+        let height = 50;
+        let sonW = 2;
+        let img = 'http://ganjz.cn/images//lock.jpg'
+        console.log(this)
+        this.context = context;
+        let randomDeg = () => Math.floor(Math.random() * 360)
+        
+        for(let j = 0;j < Math.floor(height/sonW); j++){
+            for(let i = 0; i< Math.floor(width/sonW); i++){
+                  context.fillRect(i*sonW, j*sonW, sonW, sonW)
+            }
+        }
+        
+        wx.drawCanvas({
+          canvasId: "firstCanvas",
+          actions: context.getActions(),
+        })
+      },
+      loadImage(ev) {
+        wx.downloadFile({
+          url: "http://ganjz.cn/images//lock.jpg",
+          success (){
+            console.log("success");
+            this.methods.drawCanvas();
+          }
+        })
       },
       drawMask() {
+        
+        ctx.rotate(20 * Math.PI / 180)
 
+        
+      },
+      clickCanvas(ev) {
+        console.log(ev)
+      },
+      moveFn(ev) {
+        let {
+          x,
+          y
+        } =  ev.changedTouches[0]
+        console.log(this.context)
+        this.context.clearRect(x, y, 40, 40)
+        console.log(parentEl.offsetTop)
+        
       },
       drawPassword() {
 
       }
     }
     onLoad (params, data) {
+      
       this.methods.drawCanvas();
     }
   }
