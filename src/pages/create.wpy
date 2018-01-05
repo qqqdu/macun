@@ -29,11 +29,12 @@
       flex-wrap: wrap;
     }
   }
-
-
+  .btn-group{
+    margin-top: 80px;
+  }
   .btn{
     width: 300px;
-    margin-top: 60px;
+    margin-top: 30px;
   }
 </style>
 <template>
@@ -47,28 +48,35 @@
           <input type="text" name="pswName" placeholder="保险箱名称" class='input' @input="pasNameChange"/>
           <input type="password" name="pswWord" placeholder="保险箱密码" class='input' @input="passwordChange"/>
         </view>
-        <button class="btn" @tap="backNavigate">新建</button>
+        <view class="btn-group">
+          <button class="btn" @tap="create">新建</button>
+          <button class='btn' @tap="backNavigate">返回</button>
+        </view>
       </view>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
+  import {saveBoxPassword} from '../api'
   export default class Lock extends wepy.page {
     data = {
       pasName: '',
       password: ''
     }
     methods = {
-      backNavigate() {
-        console.log(this.pasName,this.password)
-        console.log(this.$parent.globalData);
-        this.$parent.globalData.steelBox = {
-          pasName : this.pasName,
-          password: this.password
+      create() {
+        let onoff = saveBoxPassword({
+          boxName: this.pasName,
+          boxPass: this.password
+        })
+        if(onoff){
+          this.$parent.globalData.userInfo.boxName = this.pasName
+          this.$redirect('./index');
         }
-        console.log(this.$parent.globalData);
-        this.$redirect('./index');
+      },
+      backNavigate() {
+          this.$redirect('./index')
       },
       pasNameChange(ev) {
         this.pasName = ev.detail.value

@@ -1,8 +1,20 @@
 <style lang="less">
   .userinfo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding:10px;
+    font-size: 18px;
+    line-height: 40px;
+    .title{
+      text-align: center;
+    }
+    text{
+      display: block;
+      width: 100%;
+      padding:0 10px 0;
+      box-sizing: border-box;
+    }
+    button{
+      color: blue;
+    }
   }
 
   .userinfo-avatar {
@@ -21,16 +33,23 @@
   }
 
   .btn{
-    width: 200px;
-    margin-top: 60px;
+    width: 70%;
+    margin-top: 10px;
   }
 </style>
 <template>
-  <view class="container">
+  <view>
+    
     <view class="userinfo">
-      忘记保险箱密码
+      <text class="title">说明</text>
+      <text>1：密码保存在本地，考虑安全性，不会提供云端功能。</text>
+      <text>2：用户先创建保险箱，务必记牢保险箱密码，它掌握最高权限。</text>
+      <text>3：保险箱只能拥有一个</text>
+      <text>4：所有数据储存在本地，删除小程序或更换设备时务必备份密码</text>
+      <text>5：你的所有密码掌握在你手里！！！</text>
+      <text>6：码存为个人项目，如有疑问，请发送邮件到 1036971959@qq.om </text>
     </view>
-
+    <button @tap="backNavigate" class="btn">返回</button>
   </view>
 </template>
 

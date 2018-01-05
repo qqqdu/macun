@@ -17,11 +17,12 @@ import 'wepy-async-function'
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/createNewPsw',
-      'pages/lock',
       'pages/index',
+      'pages/lock',
+      'pages/forget',
+      'pages/watchPassword',
+      'pages/newPassword',
       'pages/create',
-      'pages/forget'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -32,7 +33,7 @@ export default class extends wepy.app {
   }
 
   globalData = {
-    userInfo: null,
+    userInfo: {},
     ...bus
   }
   constructor () {

@@ -14,6 +14,8 @@
 
     .userinfo-nickname {
       color: #aaa;
+      font-size: 18px;
+      line-height: 40px;
     }
 
     .input{
@@ -29,6 +31,9 @@
       width: 100%;
       display: block;
       text-align: center;
+    }
+    .myBox{
+      margin-top: 20px;
     }
   }
   .operater{
@@ -46,21 +51,21 @@
 
   <view class="container">
     <view class="userinfo">
-      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <image class="userinfo-avatar" src="../images/box.png" />
       <text class="userinfo-nickname">{{ userInfo.nickName }}</text>
-      <view wx:if="{{steelBox}}">
-        <text>输入保险箱密码</text>
-        <input type="password" name="password" class="input">
+      <view wx:if="{{userInfo.boxName||boxName}}" class="myBox">
+        <text>{{userInfo.boxName}}</text>
+        <input type="password" name="password" class="input" @input="passWordCg" wx:if="{{!userInfo.login}}">
         <button class="btn" @tap="entry">进入</button>
       </view>
       <view wx:else>
-          <text>未拥有保险箱</text>
+          <text style="margin-top:40px;">未拥有保险箱</text>
       </view>
     </view>
     
     <view class="operater">
-        <button @tap="create">去创建一个</button>
-        <button @tap="forgetPsw">忘记密码</button>
+        <button @tap="create" wx:if="{{!userInfo.boxName&&!boxName}}">去创建一个</button>
+        <button @tap="forgetPsw">码存介绍</button>
     </view>
   </view>
 </template>
@@ -70,7 +75,7 @@
   import List from '../components/list'
   import Group from '../components/group'
   import Toast from 'wepy-com-toast'
-
+  import {checkBoxPassword,getBoxName} from '../api'
   export default class Index extends wepy.page {
     config = {
       navigationBarTitleText: 'test'
@@ -86,14 +91,17 @@
     data = {
       mynum: 20,
       userInfo: {
-        nickName: '加载中...',
-        login: false
+        nickName: '码存',
+        login: false,
+        boxName: ''
       },
       steelBox: {},
+      boxName: '',
       normalTitle: '原始标题',
       setTimeoutTitle: '标题三秒后会被修改',
       count: 0,
-      netrst: ''
+      netrst: '',
+      passWord: ''
     }
 
     computed = {
@@ -103,48 +111,42 @@
     }
 
     methods = {
-      entry () {
-        this.$redirect('./lock')
+      entry: ()=> {
+        if(checkBoxPassword(this.passWord)||this.userInfo.login){
+          this.$parent.globalData.userInfo = this.userInfo
+          this.$parent.globalData.userInfo.login = true
+          this.$redirect('./lock')
+        }
+        else 
+          wx.showToast({
+            image: "../images/cry.png",
+            title: "密码错误~"
+          })
+          return;
       },
       create() {
         this.$redirect("./create")
       },
       forgetPsw() {
         this.$redirect('./forget')
+      },
+      passWordCg(ev) {
+        this.passWord = ev.detail.value
       }
     }
 
     events = {
-      'index-emit': (...args) => {
-        let $event = args[args.length - 1]
-        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
-      }
+      
     }
 
     onLoad() {
       let self = this
-      console.log(this.$parent.globalData)
+      console.log(this.$parent.globalData.userInfo)
       if(this.$parent.globalData.userInfo){
         Object.assign(this.userInfo,this.$parent.globalData.userInfo);
       }
-      if(this.$parent.globalData.steelBox){
-        Object.assign(this.steelBox, this.$parent.globalData.steelBox)
-      }
-      this.$parent.getUserInfo(function (userInfo) {
-        if (userInfo) {
-          self.userInfo = userInfo
-          self.userInfo.login = true
-        }
-        self.normalTitle = '标题已被修改'
-
-        self.setTimeoutTitle = '标题三秒后会被修改'
-        setTimeout(() => {
-          self.setTimeoutTitle = '到三秒了'
-          self.$apply()
-        }, 3000)
-
-        self.$apply()
-      })
+      console.log(this.userInfo)
+      this.boxName = getBoxName()
     }
   }
 </script>

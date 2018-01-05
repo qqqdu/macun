@@ -9,7 +9,8 @@
 
   .btn{
     width: 200px;
-    margin-top: 60px;
+    margin-top: 30px;
+    font-size: 16px;
   }
   .title{
     width: 100%;
@@ -21,25 +22,70 @@
     width: 100%;
     min-height: 300rpx;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     flex-wrap: wrap;
     margin-top: 40rpx;
     .items{
       width: 200rpx;
       height: 200rpx;
+      padding-top: 30rpx;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
+      position: relative;
+
+      .close{
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 30rpx;
+        height: 30rpx;
+        line-height: 30rpx;
+        display: block;
+        border:1px solid black;
+        border-radius: 50%;
+        z-index: 99;
+        text-align: center;
+      }
+      .close:after{
+        content: "\2716";
+        display: block;
+      }
       image{
         width: 140rpx;
         height: 140rpx;
+      }
+      .closeImage{
+        animation:mymove .3s infinite;
+        animation-timing-function:linear;
+        animation-direction:alternate;
       }
       text{
         font-size: 24rpx;
         line-height: 24rpx;
         color: #ccc;
         margin:0 auto;
+        text-align: center;
+        display: block;
+        width: 100%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
       }
+    }
+  }
+  .toast{
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+  }
+  @keyframes mymove
+  {
+    from {
+        transform: rotate(-2deg);
+    }
+    to {
+        transform: rotate(2deg);
     }
   }
 </style>
@@ -49,33 +95,20 @@
       <text>私人保险箱</text>
     </view>
     <view class='passwordList'>
-      <view class='items'>  
-        <image src='../images/timg.png'></image>
-        <text>QQ密码</text>
+      <view class='items' 
+            @tap='gotoPsw'  
+            @longpress='longPressFn'
+            wx:for="{{lockList}}" 
+            wx:key="{{id}}" 
+            data-testId="{{item.id}}">
+        <text class='close' wx:if='{{close&&item.username}}' @tap.stop="deletePsw" data-testId="{{item.id}}"></text>
+        <image src='../images/timg.png' wx:if='{{item.username}}' class='{{closeImage}}'></image>
+        <text>{{item.username}}</text>
       </view>
-      <view class='items'>  
-        <image src='../images/timg.png'></image>
-        <text>QQ密码</text>
-      </view>
-      <view class='items'>  
-        <image src='../images/timg.png'></image>
-        <text>QQ密码</text>
-      </view>
-      <view class='items'>  
-        <image src='../images/timg.png'></image>
-        <text>QQ密码</text>
-      </view>
-      <view class='items'>  
-        <image src='../images/timg.png'></image>
-        <text>QQ密码</text>
-      </view>
-      <view class='items'>  
-        <image src='../images/timg.png'></image>
-        <text>QQ密码</text>
-      </view>
+      <text class="toast" wx:if="{{lockList.length===0}}">您还没有任何密码，快去创建一个吧!!( ‘-ωก̀ )</text>
     </view>
-    <view>
-      <button class='btn'>新建密码</button>
+    <view class="btn-group">
+      <button class='btn' @tap='newPass'>新建密码</button>
       <button class='btn' @tap="backNavigate">返回</button>
     </view>
   </view>
@@ -83,15 +116,55 @@
 
 <script>
   import wepy from 'wepy'
+  import {getLockList, deleteLock} from '../api'
   export default class Lock extends wepy.page {
+    data = {
+      lockList : [],
+      close : false,
+      closeImage: ''
+    }
     methods = {
       backNavigate() {
         this.$redirect('./index');
+      },
+      gotoPsw(ev) {
+        let id = ev.currentTarget.dataset.testid
+        this.$redirect('./watchPassword?id='+id);
+      },
+      newPass() {
+        this.$redirect('./newPassword')
+      },
+      longPressFn() {
+        if(this.close){
+          this.close = false
+          this.closeImage = ''
+          return;
+        }
+        this.close = true
+        this.closeImage = "closeImage"
+      },
+      deletePsw:(ev)=> {
+        let id = ev.currentTarget.dataset.testid
+        deleteLock(id)
+        this.methods.getList()
+      },
+      getList :()=>{
+        let lockList = getLockList();
+
+        while(lockList.length%3!==0){
+          lockList.push({
+            id: '',
+            username: ''
+          })
+        }
+        this.lockList = lockList
+        this.setData({
+          "lockList":lockList
+        })
       }
     }
     onLoad (params, data) {
-      console.log(wx.navigateBack)
-      console.log(data)
+      this.methods.getList()
     }
   }
 </script>
